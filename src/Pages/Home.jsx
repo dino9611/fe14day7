@@ -1,7 +1,10 @@
 import React,{createRef} from 'react';
 
-
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import {ImHome} from 'react-icons/im'
+const MySwal = withReactContent(Swal)
 var data = [
   {nama:'budi',usia:5,alamat:'jl. sukahari'},
   {nama:'andi',usia:4,alamat:'jl. suka minggu'},
@@ -10,6 +13,7 @@ var data = [
 
 class Home extends React.Component {
   state = {
+    isModalOpen:false,
     angka:0,
     datamurid:[],
     nama:'',
@@ -69,24 +73,57 @@ class Home extends React.Component {
     this.usiaref.current.value=''
     this.alamatref.current.value=''
   }
+  swalWithBootstrapButtons = MySwal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-success',
+      cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+  })
 
   onDeleteHandler=(index)=>{
-    this.setState({indexdelete:index})
+    const {nama} =this.state.datamurid[index]
+    MySwal.fire({
+      title: `Are you sure remove ${nama} ?`,
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.value) {
+        var {datamurid}=this.state
+        datamurid.splice(index,1)
+        this.setState({datamurid})
+        MySwal.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success'
+        )
+      }else{
+        this.swalWithBootstrapButtons.fire(
+          'Cancelled',
+          'Your imaginary file is safe :)',
+          'error'
+        )
+      }
+    })
   }
 
-  onDeleteYesClick=()=>{
-    var {datamurid,indexdelete}=this.state
-    // datamurid=datamurid
-    datamurid.splice(indexdelete,1)
-    this.setState({datamurid,indexdelete:-1})
-  }
+  // onDeleteYesClick=()=>{
+  //   var {datamurid,indexdelete}=this.state
+  //   // datamurid=datamurid
+  //   datamurid.splice(indexdelete,1)
+  //   this.setState({datamurid,indexdelete:-1})
+  // }
 
   onEditClick=(index)=>{
     var {nama,usia,alamat}=this.state.datamurid[index]
     var edditformaja=this.state.editform
     edditformaja={...edditformaja,editnama:nama,editalamat:alamat,editusia:usia}
     //yang diatas itu untuk onchange kalo mau pake ref aja cukup indexedtinya aja yang diubah
-    this.setState({indexedit:index,editform:edditformaja})
+    this.setState({indexedit:index,editform:edditformaja,isModalOpen:!this.state.isModalOpen})
   }
 
 
@@ -100,7 +137,7 @@ class Home extends React.Component {
     var datamuridsatua= datamurid[this.state.indexedit]
     datamuridsatua={...datamuridsatua,nama:editnama,usia:editusia,alamat:editalamat}
     datamurid.splice(this.state.indexedit,1,datamuridsatua)
-    this.setState({datamurid:datamurid,indexedit:-1})
+    this.setState({datamurid:datamurid,isModalOpen:false})
     // console.log(editnama,'nama')
     // console.log(editusia,'usia')
     // console.log(editalamat,'alamat')
@@ -110,36 +147,37 @@ class Home extends React.Component {
     this.setState({editform:{...this.state.editform,[namaproperty]:e.target.value}})
   }
 
+  toggle = () => this.setState({isModalOpen:!this.state.isModalOpen});
 
   renderDatamurid=()=>{
     return this.state.datamurid.map((val,index)=>{
-      if(index === this.state.indexdelete){
-        return(
-        <tr key={index}>
-          <td>{index+1}</td>
-          <td>{val.nama.toUpperCase()}</td>
-          <td>{val.usia + ' tahun'}</td>
-          <td>{val.alamat}</td>
-          <td>
-            <button className='btn btn-success' onClick={this.onDeleteYesClick}>Yes</button>
-            <button className='btn btn-secondary' onClick={()=>this.setState({indexdelete:-1})}>Cancel</button>
-          </td>
-        </tr>
-        )
-      }else if(index === this.state.indexedit){
-        return(
-        <tr key={index}>
-          <td>{index+1}</td>
-          <td><input ref={this.state.editform.editnamaref} value={this.state.editform.editnama} onChange={(e)=>this.onChangeHandler(e,'editnama')} defaultValue={val.nama} /></td>
-          <td><input ref={this.state.editform.editusiaref}  onChange={(e)=>this.onChangeHandler(e,'editusia')} defaultValue={val.usia}/></td>
-          <td><input ref={this.state.editform.editalamatref} onChange={(e)=>this.onChangeHandler(e,'editalamat')} defaultValue={val.alamat}/></td>
-          <td>
-            <button className='btn btn-success' onClick={this.onSaveEditHandler} >Save</button>
-            <button className='btn btn-secondary' onClick={()=>this.setState({indexedit:-1})} >Cancel</button>
-          </td>
-        </tr>
-        )
-      }
+      // if(index === this.state.indexdelete){
+      //   return(
+      //   <tr key={index}>
+      //     <td>{index+1}</td>
+      //     <td>{val.nama.toUpperCase()}</td>
+      //     <td>{val.usia + ' tahun'}</td>
+      //     <td>{val.alamat}</td>
+      //     <td>
+      //       <button className='btn btn-success' onClick={this.onDeleteYesClick}>Yes</button>
+      //       <button className='btn btn-secondary' onClick={()=>this.setState({indexdelete:-1})}>Cancel</button>
+      //     </td>
+      //   </tr>
+      //   )
+      // }else if(index === this.state.indexedit){
+      //   return(
+      //   <tr key={index}>
+      //     <td>{index+1}</td>
+      //     <td><input ref={this.state.editform.editnamaref} value={this.state.editform.editnama} onChange={(e)=>this.onChangeHandler(e,'editnama')} defaultValue={val.nama} /></td>
+      //     <td><input ref={this.state.editform.editusiaref}  onChange={(e)=>this.onChangeHandler(e,'editusia')} defaultValue={val.usia}/></td>
+      //     <td><input ref={this.state.editform.editalamatref} onChange={(e)=>this.onChangeHandler(e,'editalamat')} defaultValue={val.alamat}/></td>
+      //     <td>
+      //       <button className='btn btn-success' onClick={this.onSaveEditHandler} >Save</button>
+      //       <button className='btn btn-secondary' onClick={()=>this.setState({indexedit:-1})} >Cancel</button>
+      //     </td>
+      //   </tr>
+      //   )
+      // }
       return (
         <tr key={index}>
           <td>{index+1}</td>
@@ -157,9 +195,24 @@ class Home extends React.Component {
 
   render() {
     // console.log('masuk render')
+    const {toggle,state}=this
+    const {isModalOpen,editform}=state
+    const {editnama,editusia,editalamat}=editform
     if(this.state.datamurid.length !== 0){
       return (
         <div style={{height:'100vh'}} className=" mt-3 d-flex justify-content-center flex-column align-items-center">
+          <Modal isOpen={isModalOpen} toggle={toggle}>
+            <ModalHeader toggle={toggle}>Edit data <ImHome/> {editnama}</ModalHeader>
+            <ModalBody>
+              <div><input className='form-control' ref={this.state.editform.editnamaref} value={this.state.editform.editnama} onChange={(e)=>this.onChangeHandler(e,'editnama')} defaultValue={editnama} /></div>
+              <div><input className='form-control' ref={this.state.editform.editusiaref}  onChange={(e)=>this.onChangeHandler(e,'editusia')} defaultValue={editusia}/></div>
+              <div><input className='form-control' ref={this.state.editform.editalamatref} onChange={(e)=>this.onChangeHandler(e,'editalamat')} defaultValue={editalamat}/></div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={this.onSaveEditHandler}>Save</Button>
+              <Button color="secondary" onClick={toggle}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
           <h1>Murid Tk Sukamaju</h1>
           <div>
             <form onSubmit={this.onTambahClick}>
