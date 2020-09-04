@@ -37,7 +37,7 @@ class Home extends React.Component {
   //   console.log('masuk willmount')
   // }
   componentDidMount(){
-    
+    console.log(this.props.provinsi)
     console.log('masuk didmount') //didmount digunakan biasanya untuk ngeload data dari backend
     setTimeout(()=>{
       this.setState({datamurid:data})

@@ -11,15 +11,17 @@ const Topic =(props)=> {
             <Header/>
             <div className='row'>
                 <div className="col-md-6">
-                    ini topic
+                        ini topic
                     <Link to='/product'>
                         <button>to Product</button>
                     </Link>
                     <Link to={match.path+'/dino'}>
-                    ke kanan
+                        {/* topics/dino */}
+                        ke kanan
                     </Link>
                     <Link to={match.path+'/max'}>
-                    ke max
+                        {/* topics/max */}
+                        ke max
                     </Link>
                 </div>
                 <div className="col-md-6">

@@ -9,7 +9,7 @@ import {
   NavbarText
 } from 'reactstrap';
 import {Link} from 'react-router-dom'
-
+import {connect} from 'react-redux'
 var angka=0
 const Header = (props) => {
   const [koppen, setIsOpen] = useState(false); //[isidata,function untuk merubah data]
@@ -39,7 +39,9 @@ const Header = (props) => {
   return (
     <div>
       <Navbar light color='purple' expand="md">
-        <NavbarBrand href='/' >reactstrap</NavbarBrand>
+        <div className='mr-5 mt-2'>
+          <Link to='/' >reactstrap</Link>
+        </div>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={koppen} navbar>
           <Nav className="mr-auto" navbar>
@@ -50,11 +52,16 @@ const Header = (props) => {
               <Link to="/topics">Topics</Link>
             </NavItem>
           </Nav>
-          <NavbarText>Simple Text</NavbarText>
+          <NavbarText>{props.bebas}</NavbarText>
         </Collapse>
       </Navbar>
     </div>
   );
 }
+const MapstatetoProps=(state)=>{
+  return {
+    bebas:state.angka
+  }
+}
 
-export default Header;
+export default connect(MapstatetoProps) (Header);
